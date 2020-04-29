@@ -4,10 +4,9 @@ from selenium.webdriver.common.action_chains import ActionChains
 import csv
 from time import sleep
 import random
-
-# Login information
 from setuptools import ssl_support
 
+# Login information
 user_name = ""
 password = ""
 
