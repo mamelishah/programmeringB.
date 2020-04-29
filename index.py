@@ -7,8 +7,8 @@ import random
 from setuptools import ssl_support
 
 # Login information
-user_name = ""
-password = ""
+user_name = "skopidoo2"
+password = "Mohammad234234"
 
 # User information
 following_list = []
@@ -45,19 +45,20 @@ class bot:
         self.soup = BS(self.currentURL, "lxml")
 
     def find_all_users_current_page_and_check(self):
+        sleep(1)
 
         for userLinks in self.soup.find_all("a", href=True, title=True):
 
-            if(userLinks.text not in following_list):
-                users_on_current_page.append(userLinks.text)
-
+            if(userLinks.get('title') not in following_list):
+                users_on_current_page.append(userLinks.get('title'))
 
         self.check_user(users_on_current_page)
 
     def check_user(self, list):
+        sleep(1)
 
         for user in list:
-            sleep(0.5)
+            sleep(1)
             self.drive.get("https://www.instagram.com/" + user + "/")
             try:
                 parent = self.drive.find_element_by_class_name("k9GMp ")
@@ -65,8 +66,8 @@ class bot:
                 user_amount_followers = parent.find_element_by_css_selector("li:nth-child(2) .g47SY ").text
                 user_amount_following = parent.find_element_by_css_selector("li:nth-child(3) .g47SY ").text
 
-                print("Followers: " +user_amount_followers)
-                print("Following: " +user_amount_following)
+                print("Followers: " + user_amount_followers)
+                print("Following: " + user_amount_following)
 
             except:
                 print("Something went wrong...")
