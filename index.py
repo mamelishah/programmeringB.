@@ -7,8 +7,8 @@ import random
 from setuptools import ssl_support
 
 # Login information
-user_name = "skopidoo2"
-password = "Mohammad234234"
+user_name = ""
+password = ""
 
 # User information
 following_list = []
