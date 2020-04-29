@@ -20,7 +20,6 @@ users_on_current_page = []
 # URL
 url = "https://www.instagram.com/accounts/login/?source=auth_switcher"
 
-
 # Driver
 drive = None
 
