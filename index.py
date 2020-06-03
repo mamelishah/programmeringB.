@@ -248,7 +248,7 @@ class bot:
                     ## CHECKING NAME AND DETERMINES THE GENDER OF THE USER
                     if(name != None):
                         if(self.girl_gender == True or self.boy_gender == True):
-                            with open("allenavne.csv", "r", encoding="UTF-8") as rd_file:
+                            with open("names.csv", "r", encoding="UTF-8") as rd_file:
                                 rd = csv.reader(rd_file)
 
                                 for x in rd:
