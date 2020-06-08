@@ -155,11 +155,9 @@ Label(root, text="Username", bg=backgroundColor_HEX, fg="black",background=rectC
 Label(root, text="Password", bg=backgroundColor_HEX, fg="black",background=rectColorHEX, font=("Comic Sans MS",19,"")).place(x=20, y=145)
 # USERNAME INPUT
 username = Entry(root, font=("",20,"bold"), borderwidth = 3,relief = SUNKEN)
-username.insert(0, "skopidoo2")
 username.place(x=155,y=90, width=275,height=42)
 # PASSWORD INPUT
 password = Entry(root, font=("",20,"bold"), borderwidth = 3, show="*")
-password.insert(0, "Tyggegummi123123")
 password.place(x=155,y=147, width=275,height=42)
 Label(root, text="This software is made by Mohammad",bg=backgroundColor_HEX, fg="black",highlightcolor="red", font=("Comic Sans MS",10,"bold")).place(x=20, y=210)
 Label(root, text="from Aarhus Gymnasium ©",bg=backgroundColor_HEX,fg="black", font=("Comic Sans MS",10,"bold")).place(x=20, y=230)
