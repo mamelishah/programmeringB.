@@ -5,11 +5,24 @@ from time import sleep
 from datetime import date, datetime
 from textblob import TextBlob as tb
 import re, random, csv
-from tkinter import *
 import pycountry
+from timeCalc import pushDate
+import threading
+from selenium.webdriver.common.keys import Keys
 
 # DATE
-date_today = date.today()
+day_today = date.today().day
+month_today = date.today().month
+year_today = date.today().year
+
+if(day_today < 10):
+    day_today = "0{}".format(day_today)
+
+if(month_today < 10):
+    month_today = "0{}".format(month_today)
+
+
+date_today = "{}/{}/{}".format(day_today,month_today,year_today)
 
 # URL
 URL = "https://www.instagram.com/accounts/login/?source=auth_switcher"
@@ -22,24 +35,7 @@ XPATH_FOLLOWERSBOX_LEN = "/html/body/div[1]/section/main/div/header/section/ul/l
 # Driver
 drive = None
 
-# USED TO REMOVE EMOIJES FROM STRINGS, IT IS IN THE FUNCTION CHECKUSER
-remove_emojis = re.compile("["
-                           u"\U0001F600-\U0001F64F" 
-        u"\U0001F300-\U0001F5FF" 
-        u"\U0001F680-\U0001F6FF"  
-        u"\U0001F1E0-\U0001F1FF" 
-        u"\U0001F1F2-\U0001F1F4"  
-        u"\U0001F1E6-\U0001F1FF"  
-        u"\U0001F600-\U0001F64F"
-        u"\U00002702-\U000027B0"
-        u"\U000024C2-\U0001F251"
-        u"\U0001f926-\U0001f937"
-        u"\U0001F1F2"
-        u"\U0001F1F4"
-        u"\U0001F620"
-        u"\u200d"
-        u"\u2640-\u2642"
-                            "]+", flags=re.UNICODE)
+
 # Class bot
 class bot:
 
@@ -56,9 +52,12 @@ class bot:
         #
         self.followed = 0
         self.liked = 0
-        self.maxFollowing = 4
-        self.maxLiking = 5
+        self.maxFollowing = 5
+        self.maxLiking = 10
         self.languages = []
+
+        self.commented = 0
+        self.commentMax = 3
 
         # CSV
         self.file = None
@@ -83,8 +82,8 @@ class bot:
         # TAGFINDER
         self.listOfPhotos_t = []
         self.dl = False
-        self.boy_gender = None
-        self.girl_gender = None
+        self.boy_activated = None
+        self.girl_activated = None
 
         # BEAUTIFULSOUP
         self.soup = None
@@ -112,9 +111,12 @@ class bot:
         try:
             getName = (self.drive.find_element_by_xpath("/html/body/div[1]/section/main/div/header/section/div[2]/h1").text).\
                 encode("UTF-8").decode()
-            getName = remove_emojis.sub(r"",getName).replace(" ","")
+            language_dec = tb(getName).detect_language()
+            language = pycountry.languages.get(alpha_2=language_dec)
+            language = language.name
+            print("LANGUAGE: ", language)
 
-            # STATEMENTS THAT TRIES TO GET THE FIRST NAME OF THE USER
+            # Values for filtering
             start = 0
             end = 0
             breaker = False
@@ -145,25 +147,62 @@ class bot:
             name = None
 
         try:
-            getTextFromBio = self.drive.find_element_by_xpath("/html/body/div[1]/section/main/div/header/section/div[2]/span").text.encode('UTF-8').decode()
-            getTextFromBio = remove_emojis.sub(r"",getTextFromBio)
-            getTextFromBio = tb(getTextFromBio).detect_language()
-            language = pycountry.languages.get(alpha_2=getTextFromBio)
+            language_dec = self.drive.find_element_by_xpath("/html/body/div[1]/section/main/div/header/section/div[2]/span").text.encode('UTF-8').decode()
+            language_dec = remove_emojis.sub(r"",language_dec)
+            print(language_dec)
+            language_dec = tb(language_dec).detect_language()
+            language = pycountry.languages.get(alpha_2=language_dec)
             language = language.name
             print("LANGUAGE: ", language)
         except:
             language = "None"
 
         return language, name
+
+    def pauseFunction(actionName):
+        sec = 0
+        wait_time = 120 # SECONDS
+
+        for _ in range(wait_time):
+            sleep(1)
+            sec += 1
+            print("SEC --> {} ({})".format(sec, actionName))
+
+            if(sec == wait_time):
+                if(actionName == "like"):
+                    self.like_now = True
+                    self.liked = 0
+                elif(actionName == "follow"):
+                    self.follow_now = True
+                    self.followed = 0
+                else:
+                    self.comment_now = True
+                    self.commented = 0
+
+    def pauseCode(self):
+
+        whenPause = "23:30"
+        pauseTime = 3600 * 8 # 8 hours
+
+        hour = datetime.now().strftime("%H")
+        minute = datetime.now().strftime("%M")
+
+        timeNow = "{}:{}".format(hour,minute)
+
+        if(whenPause == timeNow):
+            sleep(pauseTime)
+
     # HASHTAG FUNCTION. iT GOES TO THE HASHTAG AND LIKING, FOLLOWING
-    def tagFinder(self, dict_hashtags, follow, like, languages, girl, boy, windowObject):
+    def tagFinder(self, dict_hashtags, follow, like, languages, girl, boy, comment, commentList):
         self.dictOfTags = dict_hashtags
         self.follow_now = follow
         self.like_now = like
         self.languages = languages
-        self.girl_gender = girl
-        self.boy_gender = boy
-        windowSetting = windowObject
+        self.girl_activated = girl
+        self.boy_activated = boy
+
+        self.comment_now = comment
+        self.commentList = commentList
 
         lang = None
         name = None
@@ -172,23 +211,10 @@ class bot:
         text_time_like = None
         text_time_follow = None
         time_now_follow = None
-        breakingTime = 1 # BREAK TIME IN HOUR
-
-        ## LOGIN LOADING
-        logger = Tk()
-        logger.title("Loading login")
-        logger.config(height=100, width=350)
-        logger.geometry('+%d+%d' % (500, 200))
-        logger.resizable(0, 0)
-        logger['bg'] = "#000000"
-        Label(logger, text="Loading....", bg="black", fg="white", highlightcolor="red",
-              font=("Comic Sans MS", 17, "bold")).place(relx=0.5, rely=0.5, anchor=CENTER)
-        logger.after(3000, lambda: logger.destroy())
-        logger.wait_window()
+        breakingTime = 50 # BREAK TIME IN HOUR
 
         # GOES TO THE TAGS
         for tags in self.dictOfTags.keys():
-            gender_of_user = None
             self.listOfPhotos_t = []
             url_t = "https://www.instagram.com/explore/tags/{tag}/".format(tag=tags)
             amount_users = self.dictOfTags.get(tags)
@@ -196,6 +222,7 @@ class bot:
             sleep(1)
             self.get_bs(self.drive.page_source)
             ft = True
+            limit = 0
 
             # SCROLLING DOWN UNTIL THE AMOUNT OF PHOTOS IS EQUAL TO THE WEIGHT OF THE  HASHTASH
             while(ft):
@@ -204,11 +231,13 @@ class bot:
 
                 for o in self.soup.find_all(class_="Nnq7C weEfm"):
                     for l in o.find_all("a"):
+                        limit += 1
+
                         if (len(self.listOfPhotos_t) >= amount_users):
                             ft = False
                             break
 
-                        if(l["href"] not in self.listOfPhotos_t):
+                        elif(l["href"] not in self.listOfPhotos_t and limit > 9):
                             self.listOfPhotos_t.append(l["href"])
 
                 self.get_bs(self.drive.page_source)
@@ -218,9 +247,15 @@ class bot:
 
             gender_of_user = None
             gender_correct = None
+            listOfPhotoURl = []
 
             # GO TO PHOTO aND USER
             for q in self.listOfPhotos_t:
+                self.pauseCode()
+
+                if(q in listOfPhotoURl):
+                    continue
+
                 sleep(10)
                 try:
                     self.drive.get(URL_s+q) # PHOTO URL
@@ -232,40 +267,45 @@ class bot:
                     len_following_raw = self.drive.find_element_by_xpath(XPATH_FOLLOWINGBOX_LEN).text
                     len_followers_cooked = float(len_followers_raw.replace(".", "").replace(",", ""))
                     len_following_cooked = float(len_following_raw.replace(".", "").replace(",", ""))
-                    print("Username url:", self.drive.current_url)
                 except:
                     pass
 
                 else:
 
-                    print("FOLLOWERS: ", len_followers_cooked)
-                    print("FOLLOWING: ", len_following_cooked)
-
                     # GETS THE LANGUAGE AND NAME OF THE USER
-                    lang, name = self.checkUser()
-
+                    if(self.girl_activated  == True or self.boy_activated == True or len(self.languages) != 0):
+                        lang, name = self.checkUser()
 
                     ## CHECKING NAME AND DETERMINES THE GENDER OF THE USER
-                    if(name != None):
-                        if(self.girl_gender == True or self.boy_gender == True):
+                    if (self.girl_activated == True or self.boy_activated == True):
+                        if(name != None):
                             with open("names.csv", "r", encoding="UTF-8") as rd_file:
                                 rd = csv.reader(rd_file)
-
                                 for x in rd:
                                     if (x[0] == name):
-                                        print("Name from CSV: ",x[0])
+                                        print("Name from CSV: ", x[0], "G:",x[1])
                                         gender_of_user = x[1]
-                                        if(gender_of_user == "girl"):
-                                            if(self.girl_gender == True):
+                                        if (gender_of_user == "girl"):
+                                            if (self.girl_activated == 1):
                                                 gender_correct = True
-                                        elif(gender_of_user == "boy"):
-                                            if(self.boy_gender == True):
+                                                break
+                                            else:
+                                                gender_correct = False
+
+                                        elif (gender_of_user == "boy"):
+                                            if (self.boy_activated == 1):
                                                 gender_correct = True
-                                        break
+                                                break
+                                            else:
+                                                gender_correct = False
                                     else:
                                         gender_correct = False
+
                                 rd_file.close()
-                    elif(self.boy_gender == False or self.girl_gender == False):
+                        else:
+                            gender_correct = False
+
+                    else:
                         gender_correct = True
 
                     if (len(self.languages) != 0):
@@ -278,71 +318,58 @@ class bot:
                     else:
                         lang_corr = True
 
-                print("USERNAME GENDER: ", gender_of_user)
-                print("USERNAME CORRECT: ", lang)
-
                 # CHECKING THE LANGUAGES
-                if(self.like_now == True or self.follow_now):
+                if(self.follow_now == True and self.followed < self.maxFollowing):
+                    if(gender_correct == True and lang_corr == True):
+                        self.drive.find_element_by_css_selector(".BY3EC").click()
+                        self.followed += 1
+                        print("FOLLOWED -->> {} ".format(self.followed))
+                    else:
+                        pass
+                else:
                     if(self.follow_now == True):
-                        if(gender_correct == True and lang_corr == True):
-                                try:
-                                    self.drive.find_element_by_css_selector(".BY3EC").click()
-                                    self.followed += 1
-                                except:
-                                    pass
-                    sleep(2)
-
-
-                    # FOLLOWING IF like_NOW IS TRUE
-                    if(self.like_now == True):
-                        if(gender_correct == True and lang_corr == True):
-                            self.drive.get(URL_s+q)
-                            self.drive.find_element_by_css_selector(".fr66n > button:nth-child(1)").click()
-                            self.liked += 1
-
-                        elif (len(self.languages) == 0):
-                            self.drive.get(URL_s+q)
-                            self.drive.find_element_by_css_selector(".fr66n > button:nth-child(1)").click()
-                            self.liked += 1
-
-                    ### THESE STATEMENTS ARE LOOKING FOR A BREAK IF SELF.LIKED IS OVER SELF.maxLIKING
-                    if(self.liked >= self.maxLiking):
-                        if(self.like_now == True):
-                            time_now_like = datetime.now().time()
-                            text_time_like = str(time_now_like)
-                        self.like_now = False
-                        break_time_hour_like = int(text_time_like[:2])
-                        if(break_time_hour_like == 24):
-                            break_time_hour_like = 1
-                        else:
-                            break_time_hour_like  = 1
-                        break_time_min_like = (int(text_time_like[3:5]))
-                        check_time = str(datetime.now().time())
-                        if(break_time_hour_like == int(check_time[:2]) and break_time_min_like <= int(check_time[3:5])):
-                            self.like_now = True
-                            self.liked = 0
-
-                    ### THESE STATEMENTS ARE LOOKING FOR A BREAK IF SELF.FOLLOW IS OVER SELF.maxFOLLOWING
-                    if (self.followed >= self.maxFollowing):
-                        if (self.follow_now == True):
-                            time_now_follow = datetime.now().time()
-                            text_time_follow = str(time_now_follow)
-
                         self.follow_now = False
-                        break_time_hour_follow = int(text_time_follow[:2])
-                        if(break_time_hour_follow == 24):
-                            break_time_hour_follow = 1
-                        else:
-                            break_time_hour_follow = break_time_hour_follow + 1
+                        f_thread = threading.Thread(target=self.pauseFunction, args=("follow",))
+                        f_thread.start()
 
-                        break_time_min_follow = (int(text_time_follow[3:5]))
-                        check_time = str(datetime.now().time())
-                        if (break_time_hour_follow == int(check_time[:2]) and break_time_min_follow <= int(check_time[3:5])):
-                            self.follow_now = True
-                            self.followed = 0
+                sleep(5)
 
-                print("--------------")
+                # FOLLOWING IF like_NOW IS TRUE
+                if(self.like_now == True and self.liked < self.maxLiking):
+                    if(gender_correct == True and lang_corr == True):
+                        self.drive.get(URL_s+q)
+                        self.drive.find_element_by_css_selector(".fr66n > button:nth-child(1)").click()
+                        self.liked += 1
+                        print("LIKED -->> {} ".format(self.liked))
+                    else:
+                        pass
 
+                else:
+                    if(self.like_now == True):
+                        self.like_now = False
+                        l_thread = threading.Thread(target=self.pauseFunction, args=("like",))
+                        l_thread.start()
+
+                if (self.comment_now == True and self.commented < self.commentMax):
+                    if (gender_correct == True and lang_corr == True):
+                        self.drive.get(URL_s + q)
+                        textarea = self.drive.find_element_by_xpath('//textarea')
+                        textarea.click()
+                        sleep(1)
+                        textarea2 = self.drive.find_element_by_tag_name('textarea')
+                        textarea2.send_keys(self.commentList[random.randint(0, len(self.commentList)-1)])
+                        sleep(2)
+                        buttonSubmitComment = self.drive.find_element_by_css_selector(".y3zKF").click()
+                        self.commented += 1
+
+                else:
+                    if (self.comment_now == True):
+                        self.comment_now = False
+                        c_thread = threading.Thread(target=self.pauseFunction, args=("comment",))
+                        c_thread.start()
+
+                listOfPhotoURl.append(q)
+                sleep(60)
 
     # GO INTO THE USER AND FINDS ALL FOLLOWERS AND FOLLOWING ACCOUNTS
     def find_own_data(self, foll_box_XPATH, len_foll_XPATH, list):
@@ -355,14 +382,19 @@ class bot:
         else:
             sleep(2)
 
-            scro1ler_container = self.drive.find_element_by_xpath('/html/body/div[4]/div/div[2]')
+            #scro1ler_container = self.drive.find_element_by_xpath("/html/body/div[4]/div/div")
+          #  scro1ler_container = driver.find_element_by_xpath('//body/div[3]/div/div[2]/div/div[2]')
+            scro1ler_container = self.drive.find_element_by_css_selector(".pbNvD")
+            scro1ler_container = self.drive.find_element_by_xpath("//div[@class='isgrP']")
 
             sleep(2)
 
             len_of = int(self.drive.find_element_by_xpath(len_foll_XPATH).text)
+            sleep(5)
 
             for scroller in range(int(len_of/2)):
-                self.drive.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", scro1ler_container)
+
+                self.drive.execute_script('arguments[0].scrollTop = arguments[0].scrollTop + arguments[0].offsetHeight;', scro1ler_container)
                 sleep(random.randint(0, 2 * len_of)/600)
 
             sleep(1)
@@ -388,59 +420,26 @@ class bot:
             pass
 
     def unfollower(self):
-        with open("following_new.csv", "r") as read:
-            rd = csv.reader(read)
-            oo = next(rd)
-            const = 4
-            push_day = 1 + const - 2
-            months_with_30_days = [4, 6, 9, 11]
-            for line in rd:
-                date = line[1] # GETS THE DATE
-                year = int(date[:4])
-                month = int(date[5:7])
-                day = int(date[8:])
+        push = 10
+        date_from_started = date_today
 
-                if(month == 2):
-                    if(day == 28):
-                        day = push_day
-                    elif(day == 29):
-                        day = push_day
-                    month += 1
+        pathFile = "{}-(following)_new.csv".format(self.username)
+        with open(pathFile, "r") as re:
+            rd = csv.reader(re)
+            next(rd)
 
-                elif(day == 30 and month in months_with_30_days):
-                    day = push_day
-                    month += 1
+            # for line in rd:
+            #     user = line[0]
+            #     situation = pushDate(line[1], date_today, push)
+            #     print(situation)
 
-                elif(day == 31 and month not in months_with_30_days):
-                    month += 1
-                    day = push_day
-                else:
-                    day += const
-
-                if(day < 10):
-                    day = "0{}".format(day)
-
-                if(month < 10):
-                    month = "0{}".format(month)
-
-                newdate = "{}-{}-{}".format(year,month,day)
-                print("NEW: ",newdate)
-
-                if(newdate == date_today or int(date_today.day) > int(day) and int(date_today.month) >= int(month)):
-                    print(self.drive.current_url, " Name:",line[0], "Date: ",line[1])
-                    user = line[0]
-                    self.drive.get(URL_s+"/"+user+"/")
-                    sleep(1)
-                    buttonUnfolllow = self.drive.find_element_by_xpath("/html/body/div[1]/section/main/div/header/section/div[1]/div[2]/span/span[1]/button").click()
-                    buttonAccept = self.drive.find_element_by_xpath("/html/body/div[4]/div/div/div[3]/button[1]").click()
-
-            self.send_own_data_csv()
+            re.close()
 
     def appendToDateFile(self, file, list_f, list_old, list_old_n, list_date, kind_1, kind_2):
         with open(file, mode="w", newline='') as short:
 
             data_writer = csv.writer(short, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            data_writer.writerow([kind_1, kind_2])
+            data_writer.writerow([kind_1, kind_2, "LastUpdated: {}".format(date_today)])
 
             for k in range(len(list_f)):
                 if(list_f[k] not in list_old_n):
@@ -475,16 +474,16 @@ class bot:
         self.readOldCSV(path_1, self.followers_old, self.followers_old_name) # GETS THE OLD DATA FROM CSV
         self.readOldCSV(path_2, self.following_old, self.following_old_name) # GETS THE OLD DATA FROM CSV
         path_3 = "{}-(followers)_new.csv".format(self.username)
-        self.appendToDateFile(path_2,
+        self.appendToDateFile(path_3,
                               self.followers_list, self.followers_old,
                               self.followers_old_name, self.followers_date,
-                              "Followers[new]", "When they followed[date]") ## SENDS DATA TO A LIST
+                              "Followers[new]", "date") ## SENDS DATA TO A LIST
 
         # SENDS THE DATA TO LIST
         path_4 = "{}-(following)_new.csv".format(self.username)
         self.appendToDateFile(path_4, self.following_list,
                               self.following_old, self.following_old_name,
-                              self.following_date, "Following[new]", "When I followed[date]")
+                              self.following_date, "Following[new]", "date")
         self.drive.get(URL_s)
 
    # FUNCTION THAT LOGGING INTO THE ACCOUNT
@@ -493,18 +492,6 @@ class bot:
         self.password = password
         visibleWindowV = visibleWindow
         self.error_login = False
-
-        ## LOGIN LOADING
-        logger = Tk()
-        logger.title("Loading login")
-        logger.config(height=100, width=350)
-        logger.geometry('+%d+%d' % (500, 200))
-        logger.resizable(0, 0)
-        logger['bg'] = "#000000"
-        Label(logger, text="Loading....", bg="black", fg="white", highlightcolor="red",
-              font=("Comic Sans MS", 17, "bold")).place(relx=0.5, rely=0.5, anchor=CENTER)
-        logger.after(3000, lambda: logger.destroy())
-        logger.wait_window()
 
         # Makes the webdrive
         if(visibleWindowV == True):
@@ -526,6 +513,7 @@ class bot:
         # CLEARS IT
         userNameInput.clear()
         passwordInput.clear()
+
         # Sends the username and password to the input box
         userNameInput.send_keys(self.username)
         passwordInput.send_keys(self.password)
@@ -561,28 +549,37 @@ class bot:
             finally:
                 self.login_success = True
 
+
     # SAVING THE USER INFORMATION ON A CSV FILE
     def save_information_csv(self):
         path = "{}-(followers)_old.csv".format(self.username)
         with open(path, mode="w", newline='') as fb:
 
             writer_before = csv.writer(fb, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            writer_before.writerow(["Followers[name], date(DD/MM/YY)]"])
+            writer_before.writerow(["Followers[name], date(DD/MM/YY)]", "LastedUpdated: {}".format(date_today)])
 
             for n in range(0, len(self.followers_date)):
                 writer_before.writerow([self.followers_date[n][0], self.followers_date[n][1]])
 
             fb.close()
+
         path = "{}-(following)_old.csv".format(self.username)
         with open(path, mode="w", newline='') as fi:
             writer_before = csv.writer(fi, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            writer_before.writerow(["Following[name], date(DD/MM/YY)]"])
+            writer_before.writerow(["Following[name], date(DD/MM/YY)]", "Last Opdated: {}".format(date_today)])
 
             for p in range(0, len(self.following_date)):
                 writer_before.writerow([self.following_date[p][0], self.following_date[p][1]])
 
             fi.close()
 
+
+
+# window = bot()
+#
+# window.login("shiing33","mudii234234", False)
+#
+# window.tagFinder({"hello": 22}, False,False,[],False,False, True, ["Nice pic", "Nice"])
 
 
 
