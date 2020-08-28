@@ -333,7 +333,7 @@ class WorkerData(QThread):
         self.mutex.lock()
         botObject.send_own_data_csv()
         botObject.save_information_csv()
-        botObject.unfollower()
+     #   botObject.unfollower()
         self.mutex.unlock()
 
 app=QApplication(sys.argv)
@@ -624,7 +624,6 @@ if(botObject.login_success):
             super(workerLaunch, self).__init__()
 
             self.mutex = QMutex()
-
 
             self.hashtag_dict = dict_has
             self.follow = follow

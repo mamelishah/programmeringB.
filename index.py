@@ -52,12 +52,12 @@ class bot:
         #
         self.followed = 0
         self.liked = 0
-        self.maxFollowing = 5
-        self.maxLiking = 10
         self.languages = []
-
         self.commented = 0
-        self.commentMax = 3
+
+        self.maxFollowing = 3
+        self.maxLiking = 7
+        self.commentMax = 2
 
         # CSV
         self.file = None
@@ -87,6 +87,10 @@ class bot:
 
         # BEAUTIFULSOUP
         self.soup = None
+
+        self.breakfollow = False
+        self.breakLike = False
+        self.breakComment = False
 
     # TAKES THE SOURCE CODE FROM THE WEBSITE AND TRANSFORM IT TO THE BEAUTIFULSOUP
     def get_bs(self, sourcecode):
@@ -159,20 +163,20 @@ class bot:
 
         return language, name
 
-    def pauseFunction(actionName):
+    def pauseFunction(self, actionName):
         sec = 0
-        wait_time = 120 # SECONDS
+        wait_time = 60 * 60
 
         for _ in range(wait_time):
             sleep(1)
             sec += 1
             print("SEC --> {} ({})".format(sec, actionName))
 
-            if(sec == wait_time):
+            if(sec >= wait_time):
                 if(actionName == "like"):
                     self.like_now = True
                     self.liked = 0
-                elif(actionName == "follow"):
+                if(actionName == "follow"):
                     self.follow_now = True
                     self.followed = 0
                 else:
@@ -217,6 +221,7 @@ class bot:
         for tags in self.dictOfTags.keys():
             self.listOfPhotos_t = []
             url_t = "https://www.instagram.com/explore/tags/{tag}/".format(tag=tags)
+
             amount_users = self.dictOfTags.get(tags)
             self.drive.get(url_t)
             sleep(1)
@@ -256,7 +261,17 @@ class bot:
                 if(q in listOfPhotoURl):
                     continue
 
-                sleep(10)
+                sleep(3)
+
+                try:
+                    find_error = self.drive.find_element_by_css_selector(".MCXLF")
+                    if(find_error.is_displayed()):
+                        continue
+                except:
+                    pass
+
+                sleep(5)
+
                 try:
                     self.drive.get(URL_s+q) # PHOTO URL
                     sleep(3)
@@ -271,6 +286,16 @@ class bot:
                     pass
 
                 else:
+
+                    if(len_following_cooked <= len_followers_cooked):
+                        continue
+
+                    if(self.like_now == False and self.follow_now == False and self.comment_now == False):
+                        while(True):
+                            if (self.like_now == True or self.follow_now == True or self.comment_now == True):
+                                break
+                            else:
+                                sleep(1)
 
                     # GETS THE LANGUAGE AND NAME OF THE USER
                     if(self.girl_activated  == True or self.boy_activated == True or len(self.languages) != 0):
@@ -326,7 +351,8 @@ class bot:
                         print("FOLLOWED -->> {} ".format(self.followed))
                     else:
                         pass
-                else:
+
+                if(self.followed >= self.maxFollowing):
                     if(self.follow_now == True):
                         self.follow_now = False
                         f_thread = threading.Thread(target=self.pauseFunction, args=("follow",))
@@ -344,7 +370,7 @@ class bot:
                     else:
                         pass
 
-                else:
+                if (self.liked >= self.maxLiking):
                     if(self.like_now == True):
                         self.like_now = False
                         l_thread = threading.Thread(target=self.pauseFunction, args=("like",))
@@ -358,11 +384,11 @@ class bot:
                         sleep(1)
                         textarea2 = self.drive.find_element_by_tag_name('textarea')
                         textarea2.send_keys(self.commentList[random.randint(0, len(self.commentList)-1)])
-                        sleep(2)
-                        buttonSubmitComment = self.drive.find_element_by_css_selector(".y3zKF").click()
+                        sleep(3)
+                        buttonSubmitComment = self.drive.find_element_by_css_selector(".X7cDz > button:nth-child(2)").click()
                         self.commented += 1
 
-                else:
+                if(self.commented >= self.commentMax):
                     if (self.comment_now == True):
                         self.comment_now = False
                         c_thread = threading.Thread(target=self.pauseFunction, args=("comment",))
@@ -574,12 +600,13 @@ class bot:
             fi.close()
 
 
-
 # window = bot()
+# #
+# # window.login("bags2everyone.store","Rabiei1970?", False)
+# window.login("naturebyhearts","mudii234234", False)
 #
-# window.login("shiing33","mudii234234", False)
+# window.tagFinder({"views": 200, "views":200, "outdoorlife":200}, True,True,[],False,False, True, ["Wow beautiful picture! 😍 I post beautiful views of our wonderful world😎 Check us out ⭐", "Nice picture!"])
 #
-# window.tagFinder({"hello": 22}, False,False,[],False,False, True, ["Nice pic", "Nice"])
 
 
 

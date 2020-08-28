@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="506107ca-a8f9-470e-9d6b-4221d866c498" name="Default Changelist" comment="Fixed a error" />
+    <list default="true" id="506107ca-a8f9-470e-9d6b-4221d866c498" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/geckodriver.log" beforeDir="false" afterPath="$PROJECT_DIR$/geckodriver.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.py" beforeDir="false" afterPath="$PROJECT_DIR$/index.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kodeTest.py" beforeDir="false" afterPath="$PROJECT_DIR$/kodeTest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyqt5_gui2.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyqt5_gui2.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -146,11 +152,11 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.pyqt5_gui2" />
       <item itemvalue="Python.index" />
+      <item itemvalue="Python.pyqt5_gui2" />
       <item itemvalue="Python.test" />
-      <item itemvalue="Python.tkinter_gui" />
       <item itemvalue="Python.timeCalc" />
+      <item itemvalue="Python.tkinter_gui" />
     </list>
     <recent_temporary>
       <list>
@@ -271,7 +277,21 @@
       <option name="project" value="LOCAL" />
       <updated>1593106586110</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Fixed a error">
+      <created>1593108114929</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1593108114929</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Fixed a error">
+      <created>1593111537284</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1593111537284</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -296,10 +316,10 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="389" y="196" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.1280.680@0.0.1280.680" timestamp="1590792363780" />
-    <state x="247" y="0" key="CommitChangelistDialog2" timestamp="1593106681328">
+    <state x="247" y="0" key="CommitChangelistDialog2" timestamp="1593111536443">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="247" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1593106681328" />
+    <state x="247" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1593111536443" />
     <state x="93" y="93" width="1095" height="495" key="DiffContextDialog" timestamp="1591904356709">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
@@ -308,30 +328,42 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="421" y="82" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1591489079339" />
-    <state width="1259" height="163" key="GridCell.Tab.0.bottom" timestamp="1593106087501">
+    <state width="1259" height="278" key="GridCell.Tab.0.bottom" timestamp="1594493333384">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1259" height="163" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1593106087501" />
-    <state width="1259" height="163" key="GridCell.Tab.0.center" timestamp="1593106087501">
+    <state width="1259" height="278" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1594493333384" />
+    <state width="1259" height="278" key="GridCell.Tab.0.center" timestamp="1594493333384">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1259" height="163" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1593106087501" />
-    <state width="1259" height="163" key="GridCell.Tab.0.left" timestamp="1593106087500">
+    <state width="1259" height="278" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1594493333384" />
+    <state width="1259" height="278" key="GridCell.Tab.0.left" timestamp="1594493333384">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1259" height="163" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1593106087500" />
-    <state width="1259" height="163" key="GridCell.Tab.0.right" timestamp="1593106087501">
+    <state width="1259" height="278" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1594493333384" />
+    <state width="1259" height="278" key="GridCell.Tab.0.right" timestamp="1594493333384">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1259" height="163" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1593106087501" />
+    <state width="1259" height="278" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1594493333384" />
+    <state x="349" y="61" key="RollbackChangesDialog" timestamp="1593109980500">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="349" y="61" key="RollbackChangesDialog/0.0.1280.680@0.0.1280.680" timestamp="1593109980500" />
     <state x="274" y="0" key="SettingsEditor" timestamp="1591904441877">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="274" y="0" key="SettingsEditor/0.0.1280.680@0.0.1280.680" timestamp="1591904441877" />
-    <state x="233" y="74" key="Vcs.Push.Dialog.v2" timestamp="1593106729432">
+    <state x="233" y="74" key="Vcs.Push.Dialog.v2" timestamp="1593111599658">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="233" y="74" key="Vcs.Push.Dialog.v2/0.0.1280.680@0.0.1280.680" timestamp="1593106729432" />
+    <state x="233" y="74" key="Vcs.Push.Dialog.v2/0.0.1280.680@0.0.1280.680" timestamp="1593111599658" />
+    <state x="93" y="93" width="1095" height="495" maximized="true" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1593110791056">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="93" y="93" width="1095" height="495" maximized="true" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1280.680@0.0.1280.680" timestamp="1593110791056" />
+    <state x="93" y="93" width="1095" height="495" key="com.intellij.history.integration.ui.views.SelectionHistoryDialog" timestamp="1593110410874">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="93" y="93" width="1095" height="495" key="com.intellij.history.integration.ui.views.SelectionHistoryDialog/0.0.1280.680@0.0.1280.680" timestamp="1593110410874" />
     <state x="241" y="0" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1592484689641">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
@@ -348,10 +380,10 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="347" y="73" width="587" height="534" key="find.popup/0.0.1280.680@0.0.1280.680" timestamp="1590869851767" />
-    <state x="342" y="129" key="git4idea.merge.GitMergeDialog" timestamp="1593106716844">
+    <state x="342" y="129" key="git4idea.merge.GitMergeDialog" timestamp="1593111521911">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="342" y="129" key="git4idea.merge.GitMergeDialog/0.0.1280.680@0.0.1280.680" timestamp="1593106716844" />
+    <state x="342" y="129" key="git4idea.merge.GitMergeDialog/0.0.1280.680@0.0.1280.680" timestamp="1593111521911" />
     <state x="303" y="1" width="672" height="678" key="search.everywhere.popup" timestamp="1592403887297">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
