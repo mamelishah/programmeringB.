@@ -600,13 +600,3 @@ class bot:
             fi.close()
 
 
-# window = bot()
-# #
-# # window.login("bags2everyone.store","Rabiei1970?", False)
-# window.login("naturebyhearts","mudii234234", False)
-#
-# window.tagFinder({"views": 200, "views":200, "outdoorlife":200}, True,True,[],False,False, True, ["Wow beautiful picture! 😍 I post beautiful views of our wonderful world😎 Check us out ⭐", "Nice picture!"])
-#
-
-
-
